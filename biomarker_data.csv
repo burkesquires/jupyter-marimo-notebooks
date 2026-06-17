@@ -1,0 +1,201 @@
+participant_id,age,sex,pfoa_serum,cholesterol,site
+1,52,Female,0.28,164,Chapel Hill
+2,33,Female,2.34,219,Research Triangle Park
+3,59,Female,1.46,279,Durham
+4,61,Male,3.37,147,Durham
+5,21,Female,4.19,161,Research Triangle Park
+6,30,Female,2.52,194,Research Triangle Park
+7,50,Male,4.41,190,Durham
+8,44,Male,2.74,241,Durham
+9,48,Female,3.59,219,Chapel Hill
+10,36,Male,1.18,143,Chapel Hill
+11,60,Male,1.89,230,Research Triangle Park
+12,59,Male,2.66,188,Research Triangle Park
+13,49,Female,4.66,258,Research Triangle Park
+14,64,Female,1.56,186,Durham
+15,55,Male,3.56,186,Research Triangle Park
+16,36,Female,1.75,231,Research Triangle Park
+17,53,Female,2.0,239,Chapel Hill
+18,35,Female,4.7,227,Chapel Hill
+19,60,Male,0.37,146,Chapel Hill
+20,47,Male,0.69,230,Research Triangle Park
+21,45,Female,0.59,171,Durham
+22,38,Male,0.27,219,Durham
+23,65,Female,1.21,156,Research Triangle Park
+24,46,Male,4.37,227,Durham
+25,42,Male,1.72,179,Durham
+26,43,Female,2.66,161,Durham
+27,55,Female,5.93,237,Chapel Hill
+28,53,Female,7.35,219,Chapel Hill
+29,54,Male,2.09,187,Durham
+30,54,Male,7.52,265,Chapel Hill
+31,78,Male,2.42,193,Chapel Hill
+32,42,Male,1.05,211,Durham
+33,41,Female,1.3,220,Research Triangle Park
+34,37,Male,0.59,186,Chapel Hill
+35,57,Female,1.0,228,Chapel Hill
+36,64,Female,1.61,190,Chapel Hill
+37,46,Male,4.59,194,Research Triangle Park
+38,36,Male,10.47,262,Durham
+39,36,Female,0.64,170,Chapel Hill
+40,57,Female,3.17,118,Durham
+41,58,Male,0.87,271,Chapel Hill
+42,56,Male,3.41,307,Research Triangle Park
+43,39,Male,1.98,195,Research Triangle Park
+44,51,Female,0.43,136,Chapel Hill
+45,50,Female,5.13,198,Durham
+46,51,Female,1.29,199,Durham
+47,60,Male,1.38,203,Durham
+48,51,Male,0.85,168,Durham
+49,58,Female,1.24,232,Chapel Hill
+50,49,Female,3.27,230,Research Triangle Park
+51,52,Female,1.88,153,Chapel Hill
+52,57,Male,2.99,237,Chapel Hill
+53,28,Male,3.08,288,Durham
+54,44,Female,7.31,217,Durham
+55,41,Female,1.63,197,Research Triangle Park
+56,39,Male,0.59,205,Chapel Hill
+57,44,Female,5.82,233,Durham
+58,69,Male,1.65,144,Research Triangle Park
+59,36,Female,6.07,216,Durham
+60,62,Female,3.14,195,Chapel Hill
+61,24,Male,1.98,280,Research Triangle Park
+62,43,Female,3.05,203,Research Triangle Park
+63,50,Female,12.88,273,Chapel Hill
+64,56,Female,14.43,168,Research Triangle Park
+65,58,Female,2.37,232,Chapel Hill
+66,59,Female,2.57,222,Chapel Hill
+67,43,Female,5.86,177,Chapel Hill
+68,42,Female,1.04,217,Chapel Hill
+69,60,Female,3.0,256,Research Triangle Park
+70,45,Male,2.17,198,Research Triangle Park
+71,30,Male,2.95,146,Durham
+72,32,Female,1.05,209,Durham
+73,35,Female,0.53,176,Chapel Hill
+74,55,Female,0.34,197,Chapel Hill
+75,50,Male,0.81,207,Durham
+76,58,Male,1.47,145,Chapel Hill
+77,42,Female,1.71,149,Durham
+78,50,Female,12.72,228,Durham
+79,57,Female,6.02,190,Durham
+80,44,Female,0.94,113,Durham
+81,54,Male,3.04,240,Research Triangle Park
+82,39,Female,1.54,220,Chapel Hill
+83,43,Female,1.72,183,Durham
+84,43,Female,2.63,160,Chapel Hill
+85,31,Female,3.89,242,Durham
+86,55,Female,1.64,223,Chapel Hill
+87,41,Male,5.8,301,Chapel Hill
+88,48,Female,0.8,226,Durham
+89,55,Male,2.24,225,Durham
+90,54,Female,23.06,204,Research Triangle Park
+91,57,Male,2.72,241,Chapel Hill
+92,47,Male,8.08,234,Chapel Hill
+93,42,Male,2.42,258,Chapel Hill
+94,47,Male,3.75,190,Chapel Hill
+95,24,Male,2.11,193,Chapel Hill
+96,28,Male,1.91,192,Chapel Hill
+97,29,Male,1.1,240,Durham
+98,34,Female,3.28,267,Research Triangle Park
+99,54,Female,1.03,193,Research Triangle Park
+100,35,Female,4.05,194,Research Triangle Park
+101,43,Male,5.91,222,Durham
+102,66,Female,3.1,201,Chapel Hill
+103,43,Female,1.72,246,Durham
+104,58,Male,3.35,124,Research Triangle Park
+105,35,Female,1.69,179,Research Triangle Park
+106,45,Female,5.17,180,Chapel Hill
+107,35,Female,0.43,122,Chapel Hill
+108,43,Female,1.65,173,Durham
+109,60,Female,0.37,175,Chapel Hill
+110,24,Female,0.58,202,Chapel Hill
+111,54,Female,7.59,252,Chapel Hill
+112,51,Female,4.98,201,Chapel Hill
+113,40,Female,1.16,171,Durham
+114,28,Male,0.58,208,Durham
+115,49,Female,0.15,250,Durham
+116,41,Male,1.36,173,Research Triangle Park
+117,51,Male,19.66,175,Durham
+118,48,Female,3.29,231,Durham
+119,70,Female,1.34,202,Durham
+120,45,Female,3.38,235,Durham
+121,34,Male,0.55,209,Durham
+122,51,Male,1.7,237,Durham
+123,51,Male,2.43,171,Research Triangle Park
+124,67,Female,2.06,210,Durham
+125,60,Male,4.53,202,Durham
+126,53,Female,3.03,164,Chapel Hill
+127,68,Male,4.06,151,Durham
+128,31,Female,1.2,236,Durham
+129,39,Male,4.99,197,Research Triangle Park
+130,35,Male,9.64,171,Research Triangle Park
+131,43,Female,0.93,206,Durham
+132,29,Male,1.0,253,Durham
+133,57,Female,7.41,123,Durham
+134,45,Male,1.87,153,Durham
+135,27,Female,7.87,175,Chapel Hill
+136,34,Male,1.49,266,Research Triangle Park
+137,52,Female,8.24,221,Research Triangle Park
+138,60,Male,2.51,239,Research Triangle Park
+139,76,Male,2.81,167,Research Triangle Park
+140,89,Male,9.1,167,Chapel Hill
+141,54,Male,1.61,227,Research Triangle Park
+142,34,Male,0.95,212,Durham
+143,18,Male,1.49,231,Research Triangle Park
+144,52,Female,3.34,203,Chapel Hill
+145,37,Male,0.54,221,Chapel Hill
+146,42,Female,3.95,216,Research Triangle Park
+147,39,Male,1.37,240,Research Triangle Park
+148,46,Female,6.25,241,Research Triangle Park
+149,63,Male,0.26,148,Durham
+150,50,Male,1.1,125,Chapel Hill
+151,46,Female,0.49,248,Durham
+152,34,Female,1.06,255,Chapel Hill
+153,25,Male,2.78,171,Durham
+154,41,Male,1.89,139,Research Triangle Park
+155,47,Female,1.77,214,Durham
+156,73,Male,1.93,245,Research Triangle Park
+157,50,Male,2.67,278,Chapel Hill
+158,62,Female,0.9,230,Research Triangle Park
+159,41,Female,4.2,196,Durham
+160,31,Female,4.04,176,Durham
+161,34,Male,3.15,210,Research Triangle Park
+162,38,Female,3.67,199,Durham
+163,78,Male,2.91,171,Durham
+164,37,Male,13.9,288,Research Triangle Park
+165,60,Female,2.06,278,Research Triangle Park
+166,35,Male,1.69,253,Research Triangle Park
+167,61,Male,1.13,175,Research Triangle Park
+168,53,Female,0.88,242,Durham
+169,46,Female,0.73,234,Research Triangle Park
+170,47,Female,1.0,227,Chapel Hill
+171,39,Female,2.09,257,Research Triangle Park
+172,54,Female,3.01,234,Durham
+173,42,Male,2.33,238,Chapel Hill
+174,31,Female,1.12,234,Durham
+175,30,Female,5.0,223,Chapel Hill
+176,50,Male,4.33,142,Research Triangle Park
+177,70,Male,1.93,213,Research Triangle Park
+178,50,Male,1.24,189,Research Triangle Park
+179,46,Male,3.65,161,Research Triangle Park
+180,52,Female,2.64,274,Research Triangle Park
+181,66,Female,0.6,276,Research Triangle Park
+182,51,Male,2.09,262,Chapel Hill
+183,42,Male,2.82,220,Research Triangle Park
+184,63,Male,0.99,261,Chapel Hill
+185,54,Female,2.64,210,Chapel Hill
+186,70,Male,0.6,218,Chapel Hill
+187,51,Male,7.41,168,Research Triangle Park
+188,31,Female,6.84,225,Chapel Hill
+189,29,Male,1.77,212,Durham
+190,71,Male,3.09,160,Chapel Hill
+191,72,Female,0.25,208,Durham
+192,45,Female,0.79,207,Chapel Hill
+193,43,Male,1.71,278,Durham
+194,68,Female,0.85,244,Research Triangle Park
+195,33,Female,4.23,210,Durham
+196,35,Female,13.43,219,Research Triangle Park
+197,57,Female,0.77,212,Chapel Hill
+198,42,Male,1.05,202,Research Triangle Park
+199,48,Male,2.75,169,Research Triangle Park
+200,46,Female,9.49,204,Durham
