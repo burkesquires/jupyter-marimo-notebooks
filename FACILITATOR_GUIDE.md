@@ -45,7 +45,7 @@ On the TLJH host:
 
 ```bash
 sudo /opt/tljh/user/bin/pip install 'marimo[sandbox]>=0.23.9' \
-    marimo-jupyter-extension duckdb sqlglot pandas matplotlib
+    marimo-jupyter-extension duckdb sqlglot pandas matplotlib pytest
 ```
 
 This installs into TLJH's shared user environment, so it should be available
@@ -130,7 +130,8 @@ file.
 - [ ] Full Restart & Run All on `01_jupyter_morning_session.ipynb` on the
       actual delivery platform (TLJH)
 - [ ] Full run of `02_marimo_afternoon_session.py` on the actual delivery
-      platform — confirm `mo.ui`, matplotlib figures, and the SQL cells
-      (needs `duckdb` + `sqlglot`) all render
+      platform — confirm `mo.ui`, matplotlib figures, the SQL cells
+      (needs `duckdb` + `sqlglot`), and the unit test cells (needs `pytest`)
+      all render and pass
 - [ ] Spot-check that attendee accounts have write access to the folder
       (Exercises require editing and saving)

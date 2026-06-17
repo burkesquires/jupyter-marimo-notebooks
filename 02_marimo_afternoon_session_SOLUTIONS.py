@@ -27,8 +27,8 @@ def _(mo):
         | 2:20 - 2:35 | *Break* |
         | 2:35 - 3:15 | Module 4: Interactive UI |
         | 3:15 - 3:45 | Module 5: SQL Cells |
-        | 3:45 - 4:10 | Module 6: Apps, Export & Conversion |
-        | 4:10 - 4:30 | Module 7: Recap & Q&A |
+        | 3:45 - 4:15 | Module 6: Apps, Export, Sandbox & Testing |
+        | 4:15 - 4:30 | Module 7: Recap & Q&A |
 
         **Goal of the afternoon:** see how a *reactive* notebook changes the
         rules from this morning. Same dataset (`biomarker_data.csv`), same
@@ -570,7 +570,7 @@ def _(mo):
     mo.md(
         r"""
         ---
-        ## Module 6: Apps, Export & Conversion (25 min)
+        ## Module 6: Apps, Export, Sandbox & Testing (30 min)
 
         ### From notebook to app
 
@@ -585,6 +585,10 @@ def _(mo):
         `marimo export` can produce several formats from this file:
 
         - `marimo export html notebook.py -o out.html` — static HTML snapshot
+        - `marimo export html-wasm notebook.py -o build/` — **interactive**
+          notebook that runs entirely in the browser (no server required);
+          suitable for GitHub Pages or sharing with non-technical collaborators
+          via a URL (this is how [molab](https://molab.marimo.io) itself works)
         - `marimo export ipynb notebook.py -o out.ipynb` — a **Jupyter
           notebook**, cells in dependency (topological) order
         - `marimo export script notebook.py` — flatten to a plain `.py`
@@ -600,12 +604,147 @@ def _(mo):
         marimo's one-name-one-cell rule won't allow — you'll need to rename
         those, the same way we renamed `df` to `df_durham` in Module 3.
 
+        ### Sandbox mode & reproducible environments
+
+        When you run `marimo edit notebook.py --sandbox`, marimo launches the
+        notebook in a fully isolated environment (powered by `uv` under the
+        hood). If any imported package is not yet declared, marimo prompts you
+        to install it, then automatically adds a **dependency block** at the
+        very top of the `.py` file:
+
+        ```python
+        # /// script
+        # requires-python = ">=3.11"
+        # dependencies = [
+        #     "marimo",
+        #     "numpy==2.2.5",
+        #     "pandas==2.2.3",
+        # ]
+        # ///
+        ```
+
+        This is a [PEP 723](https://peps.python.org/pep-0723/) inline script
+        metadata block. Anyone who receives the `.py` file can run
+        `marimo edit notebook.py --sandbox` and the right package versions
+        will be installed automatically — no `requirements.txt` to keep in
+        sync, no conda environment to document separately. The notebook
+        *carries its own environment*.
+
+        **Why it was disabled on this JupyterHub:** sandbox mode downloads
+        packages on first open, which is fragile on conference wifi and
+        redundant when everyone shares a pre-built server environment. For
+        post-workshop local use (your own laptop, molab, or a personal
+        server), `--sandbox` is the right default for any analysis you'll
+        share or come back to later.
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### Unit testing in marimo
+
+        Because a marimo notebook is a plain `.py` file, it integrates with
+        `pytest` in two ways that Jupyter can't match without add-on packages:
+
+        1. **In-notebook test cells:** any cell whose *entire content* is
+           `def test_...` functions is automatically detected and run by
+           marimo when `pytest` is installed. Pass/fail results appear
+           inline in the notebook, live as you edit.
+        2. **Terminal:** `pytest notebook.py` works directly — marimo's
+           pytest plugin collects and runs all test cells, making CI
+           integration (GitHub Actions, etc.) straightforward with no extra
+           setup.
+
+        For scientific analysis this is genuinely useful: you can write
+        data-validity checks right alongside the analysis code, and they
+        re-run automatically whenever `df` changes.
+
+        Below are two example tests on our biomarker data, followed by an
+        exercise to write two more.
+        """
+    )
+    return
+
+
+@app.cell
+def _(df):
+    # Example test cell — marimo runs these automatically with pytest.
+    # Note: df arrives as a dependency (it's in this cell's signature),
+    # and the test functions close over it. No import needed.
+
+    def test_pfoa_nonnegative():
+        """PFOA is a concentration — all values should be >= 0."""
+        assert (df["pfoa_serum"] >= 0).all(), \
+            f"Found {(df['pfoa_serum'] < 0).sum()} negative PFOA values"
+
+    def test_participant_count():
+        """Dataset should have exactly 200 participants."""
+        assert len(df) == 200, f"Expected 200 rows, got {len(df)}"
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### Exercise 6.1 — Write your own data validation test
+
+        The starter cell below has `test_sex_values` already completed as a
+        model to follow. Your task: **uncomment and complete
+        `test_cholesterol_range`** — confirm all cholesterol values fall
+        between 50 and 400 mg/dL (a biologically plausible range for this
+        dataset).
+
+        Watch marimo run both tests inline as soon as you save the cell. Then
+        try deliberately breaking your assertion (e.g. change `400` to `100`)
+        and observe the failure output — that's what a collaborator would see
+        if the data ever violated the assumption.
+
+        Bonus: if you have a terminal available, try running pytest directly
+        on this file:
+        ```
+        pytest 02_marimo_afternoon_session.py -v
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("✅ **Solution to Exercise 6.1** — both tests completed:")
+    return
+
+
+@app.cell
+def _(df):
+    # ✅ Exercise 6.1 solution
+
+    def test_sex_values():
+        expected_sex = {"Female", "Male"}
+        actual_sex = set(df["sex"].unique())
+        assert actual_sex == expected_sex, f"Unexpected sex values: {actual_sex}"
+
+    def test_cholesterol_range():
+        assert (df["cholesterol"] >= 50).all() and (df["cholesterol"] <= 400).all(), \
+            f"Cholesterol out of range [50, 400]: min={df['cholesterol'].min()}, max={df['cholesterol'].max()}"
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
         ### molab — marimo in the cloud
 
-        For trying marimo with zero install, [molab](https://molab.marimo.io)
-        is a free, cloud-hosted marimo notebook environment (similar to
-        Google Colab, but for marimo) — useful if you want to keep
-        experimenting after today without setting anything up locally.
+        For trying marimo with zero install after today,
+        [molab](https://molab.marimo.io) is a free, cloud-hosted marimo
+        environment — useful if you want to keep experimenting without a
+        local setup. Notebooks can also be mirrored from GitHub, so a
+        `--sandbox`-enabled `.py` file pushed to a repo opens and runs
+        cleanly on molab with its declared dependencies.
         """
     )
     return
@@ -616,7 +755,7 @@ def _(mo):
     mo.md(
         r"""
         ---
-        ## Module 7: Recap & Q&A (20 min)
+        ## Module 7: Recap & Q&A (15 min)
 
         | | Jupyter | marimo |
         |---|---|---|
@@ -628,6 +767,8 @@ def _(mo):
         | SQL on DataFrames | Via libraries (e.g. `duckdb` manually) | Native `mo.sql` cells |
         | Running as an app | Needs a separate framework (Voila, Streamlit, ...) | `marimo run` on the same file |
         | Version control diffs | Noisy (JSON, embedded outputs) | Clean (plain Python) |
+        | Unit testing | External tools (`ipytest`) or separate test scripts | Native test cells; `pytest notebook.py` works directly |
+        | Reproducible environments | Global install; deps implicit | `--sandbox` mode; deps pinned in script header |
 
         ### When to use which
 
