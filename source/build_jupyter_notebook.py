@@ -61,6 +61,19 @@ all your variables in memory. The notebook file itself is just a record of
 cells and their *last* outputs; the kernel is where the *actual* program
 state lives.
 
+It helps to picture these as **two separate things**:
+
+- The **document** — the `.ipynb` file on disk (or what you see in the
+  browser): an ordered list of cells, plus a saved copy of each cell's most
+  recent output.
+- The **kernel** — a live Python process running in the background. It
+  remembers every variable you've defined, every library you've imported,
+  and every function you've created, regardless of where (or whether) those
+  things still appear in the document.
+
+Almost every notebook "gotcha" we'll see today comes from these two drifting
+apart. Keep the distinction in your back pocket.
+
 Let's start the kernel by running the cell below.
 """))
 
@@ -68,7 +81,14 @@ cells.append(code(r"""print("Hello, NIEHS!")"""))
 
 cells.append(md(r"""Notice the `In [1]` / `Out[1]` (or just `[1]`) to the left of the cell.
 That number is the **execution count** — it tells you the *order in which
-cells were run*, not their position in the notebook.
+cells were run*, not their position in the notebook. A few states worth
+recognizing:
+
+- `[ ]` (empty) — the cell hasn't run since the kernel started
+- `[*]` — the cell is *running right now* (useful for spotting a long
+  computation, or one that's hung)
+- `[7]` — the cell finished, and it was the 7th cell executed in this kernel
+  session
 
 Two modes you'll move between constantly:
 
@@ -79,11 +99,22 @@ Two modes you'll move between constantly:
 |---|---|
 | `Shift + Enter` | Run cell, move to next |
 | `Ctrl + Enter` | Run cell, stay put |
+| `Alt + Enter` | Run cell, insert new one below |
 | `Esc` then `A` | Insert cell **a**bove |
 | `Esc` then `B` | Insert cell **b**elow |
 | `Esc` then `D D` | **D**elete cell (press D twice) |
 | `Esc` then `M` | Convert cell to **m**arkdown |
 | `Esc` then `Y` | Convert cell to code |
+| `Esc` then `Z` | Undo cell delete |
+
+Two kernel controls you'll want to know early, both in the **Kernel** menu
+(and on the toolbar):
+
+- **Interrupt** (the ■ stop button) — stops a cell that's running too long or
+  stuck in a loop, without wiping your variables.
+- **Restart** — kills the Python process and starts fresh: *every* variable,
+  import, and function is gone. This is the big reset we'll lean on for
+  reproducibility later.
 
 Try it: click this cell, press `Esc`, then `B`, then `Shift+Enter` on the new
 empty cell below to create and run a blank code cell."""))
@@ -124,6 +155,12 @@ Markdown cells are how a notebook becomes a **computational narrative** —
 code *and* the reasoning around it, in one document. The cell you're reading
 right now is markdown.
 
+A markdown cell has two states: **edit** (you see the raw text, with the
+`#`, `*`, and `|` symbols) and **rendered** (you see the formatted result).
+`Shift+Enter` renders it; double-click goes back to editing. Everything
+below is the raw syntax — double-click this cell anytime to see how it's
+written.
+
 Common syntax:
 
 ```
@@ -138,7 +175,26 @@ Common syntax:
 2. list
 
 [a link](https://example.com)
+
+> a blockquote, good for callouts
 ```
+
+You can also build **tables**, which are handy for small results summaries
+or data dictionaries:
+
+```
+| Column | Meaning | Units |
+|---|---|---|
+| pfoa_serum | Serum PFOA concentration | ng/mL |
+| cholesterol | Total cholesterol | mg/dL |
+```
+
+renders as:
+
+| Column | Meaning | Units |
+|---|---|---|
+| pfoa_serum | Serum PFOA concentration | ng/mL |
+| cholesterol | Total cholesterol | mg/dL |
 
 Markdown cells also render **LaTeX math**, using `$...$` for inline math and
 `$$...$$` for a centered equation on its own line. For example, body mass
@@ -146,7 +202,11 @@ index:
 
 $$ BMI = \frac{\text{weight}_{kg}}{\text{height}_m^2} $$
 
-is written as `$$ BMI = \frac{\text{weight}_{kg}}{\text{height}_m^2} $$`."""))
+is written as `$$ BMI = \frac{\text{weight}_{kg}}{\text{height}_m^2} $$`.
+
+For scientific work this matters: you can write the actual formula a cell
+implements right next to the code, so a reviewer can check that the code
+matches the math."""))
 
 cells.append(md(r"""### Exercise 2.1 — Write your own markdown cell
 
@@ -185,6 +245,27 @@ with age, sex, site, serum PFOA, and total cholesterol. (This is the same
 dataset used in the afternoon marimo session, and the same one from prior
 NIEHS R/Quarto trainings, just regenerated in Python.)
 
+The columns:
+
+| Column | Meaning |
+|---|---|
+| `participant_id` | Unique ID, 1–200 |
+| `age` | Age in years |
+| `sex` | Female / Male |
+| `pfoa_serum` | Serum PFOA concentration (ng/mL) |
+| `cholesterol` | Total cholesterol (mg/dL) |
+| `site` | One of three NC study sites |
+
+A quick orientation to the three workhorse functions you'll use on almost
+any new dataset:
+
+- `df.head()` — peek at the first few rows (is the data shaped the way you
+  expect?)
+- `df.info()` — column names, data types, and non-null counts (did anything
+  import as the wrong type, or have missing values?)
+- `df.describe()` — summary statistics for numeric columns (do the ranges
+  look sane?)
+
 Run the cells below in order."""))
 
 cells.append(code(r"""import pandas as pd
@@ -197,14 +278,54 @@ cells.append(code(r"""df.info()"""))
 
 cells.append(code(r"""df.describe()"""))
 
-cells.append(md(r"""### Exercise 3.1 — A quick filter
+cells.append(md(r"""`describe()` only covers numeric columns. For categorical columns like
+`site` and `sex`, `value_counts()` is the equivalent — it tells you the
+categories and how many rows fall in each:"""))
 
-In the empty cell below, write code to:
+cells.append(code(r"""df["site"].value_counts()"""))
 
-1. Filter `df` to only rows where `site == "Durham"`
-2. Compute the mean `pfoa_serum` for that subset
+cells.append(md(r"""And a very common first analysis step: a **grouped summary** — split the
+data by a category, then summarize each group. Here, mean PFOA and
+cholesterol per site:"""))
 
-(Hint: `df[df["site"] == "Durham"]["pfoa_serum"].mean()`)"""))
+cells.append(code(r"""df.groupby("site")[["pfoa_serum", "cholesterol"]].mean()"""))
+
+cells.append(md(r"""### Exercise 3.1 — A quick filter (two ways)
+
+So far we've selected rows with **boolean indexing** — `df[df["site"] ==
+"Durham"]`. Read it inside-out: `df["site"] == "Durham"` produces a column
+of `True`/`False`, one per row, and `df[...]` keeps only the `True` rows.
+It's powerful but the doubled `df[df[...]]` can be hard to read.
+
+pandas offers a second style, **`.query()`**, that takes a condition as a
+string and reads much more like plain English (or SQL — which is exactly
+what you'll meet in the afternoon marimo session):
+
+```python
+df.query("site == 'Durham'")          # same result as df[df["site"] == "Durham"]
+df.query("age > 50 and sex == 'Male'")  # conditions chain naturally
+```
+
+A few things to notice about `.query()`:
+
+- Column names are written **bare** (`site`, not `df["site"]`).
+- String *values* still need quotes — and since the whole condition is
+  already in double quotes, use single quotes inside (`'Durham'`).
+- Combine conditions with `and` / `or` (not `&` / `|` as in boolean
+  indexing).
+
+**Your task** — in the empty cell below, using **`.query()`**:
+
+1. Select only rows where `site == "Durham"`
+2. From that result, compute the mean `pfoa_serum`
+
+(Hint: `df.query("site == 'Durham'")["pfoa_serum"].mean()`)
+
+If you finish early: write the *same* filter the boolean-indexing way
+(`df[df["site"] == "Durham"]...`) and confirm the two numbers match. They
+should — `.query()` is a more readable spelling of the same operation, not a
+different result. Two paths to one answer is a good habit for catching
+mistakes."""))
 
 cells.append(code(r"""# Your code here
 """))
@@ -249,9 +370,20 @@ no longer exists in that form. A notebook can *look* internally consistent
 and be completely wrong, because nothing forces cells to stay in sync with
 each other.
 
+To make the answer explicit: after step 2, Cell B's output still showed the
+*old* mean — computed from the `age > 50` version of `older`, even though
+Cell A now defines `older` as `age > 60`. The displayed number was a
+**snapshot from the last time Cell B ran**, not a live reflection of the
+current data. Only re-running Cell B (step 4) brought it back into sync. And
+after a kernel restart (step 5), the *output text remains visible in the
+document* even though the kernel no longer has `older` defined at all —
+proof that what you see is the saved document, not the live program.
+
 This isn't a Jupyter bug — it's a direct consequence of cells being
-independently runnable in any order. Keep this example in mind; we'll
-revisit it this afternoon."""))
+independently runnable in any order. It's also not unique to Jupyter; the
+same hazard exists in any notebook-style tool that lets you run cells
+piecemeal. Keep this example in mind; we'll revisit it this afternoon and
+see a tool that closes the gap."""))
 
 cells.append(md(r"""### Exercise 3.2 — Break it, then find it
 
@@ -290,11 +422,24 @@ A few habits that prevent the problems from Module 3:
    `df = df[...]` repeated across many cells). Each reassignment makes
    "which version of `df` am I looking at?" harder to answer. Prefer new
    names for meaningfully different subsets: `df_durham`, `df_older`, etc.
-4. **Clear outputs before committing to version control** (Edit →
+4. **Keep imports and file-loading near the top.** Putting `import pandas`,
+   `pd.read_csv(...)`, and other setup in the first few cells means a reader
+   (or future-you) can run the notebook top-to-bottom without hunting for a
+   stray import buried in the middle.
+5. **Use relative paths and check your working directory.** This notebook
+   loads `"biomarker_data.csv"` with no folder in front of it, which works
+   because the file sits in the same directory. If a load fails with
+   `FileNotFoundError`, run `import os; os.getcwd()` to see where the kernel
+   actually is — it's a frequent source of "it worked yesterday" confusion.
+6. **Clear outputs before committing to version control** (Edit →
    Clear Outputs, or `nbstripout` if you use git). Stale outputs in a shared
    `.ipynb` are a common source of confusion.
-5. **Save / export** — `File → Save and Checkpoint`, and `File → Download
-   as` (or `jupyter nbconvert`) to get `.py`, `.html`, or `.pdf` versions."""))
+7. **Save / export** — `File → Save and Checkpoint`, and `File → Download
+   as` (or `jupyter nbconvert`) to get `.py`, `.html`, or `.pdf` versions.
+
+The first three are about *avoiding* trouble; the rest are about making your
+notebook legible to the next person who opens it — very often yourself, six
+months later."""))
 
 cells.append(md(r"""### Exercise 4.1 — The gold-standard test
 
@@ -305,7 +450,14 @@ cells.append(md(r"""### Exercise 4.1 — The gold-standard test
 3. Confirm: does the notebook run from top to bottom with no errors?
 
 This "Restart & Run All, no errors" check is something you should be able to
-do with *every* notebook before walking away from it."""))
+do with *every* notebook before walking away from it.
+
+If you're curious where the kernel is reading files from (hygiene habit #5),
+run the cell below — it prints the kernel's current working directory, which
+is the folder `pd.read_csv("biomarker_data.csv")` looked in:"""))
+
+cells.append(code(r"""import os
+print("Kernel working directory:", os.getcwd())"""))
 
 # ---------------------------------------------------------------------------
 # Module 5
@@ -313,21 +465,38 @@ do with *every* notebook before walking away from it."""))
 cells.append(md(r"""---
 ## Module 5: Looking Ahead (15 min)
 
-Let's name the pain points from this morning:
+Let's name the pain points from this morning — each one traces back to a
+specific moment you just lived through:
 
 - **Execution order is invisible** — the document doesn't show you the
-  *order* cells actually ran in, only the *last* order.
+  *order* cells actually ran in, only the *last* order. (Exercise 1.1: the
+  `In [n]` counter was your only clue.)
 - **State can outlive its source** — delete or change the cell that created
-  a variable, and the kernel may still remember the old value.
+  a variable, and the kernel may still remember the old value. (Exercise
+  3.2: `threshold` kept working after you deleted its cell.)
 - **Outputs can be stale** — what's on screen may not reflect the current
-  code or data at all.
+  code or data at all. (The Cell A / Cell B trap: Cell B's number was a
+  snapshot, not a live value.)
 - **Discipline is the only fix** — Restart & Run All works, but it relies on
-  *you* remembering to do it.
+  *you* remembering to do it. (Exercise 4.1: nothing *forces* the check;
+  you have to choose to run it.)
+
+None of these mean Jupyter is bad — it's the most widely used notebook in
+the world for good reason, and the skills you built this morning transfer
+everywhere. But it's worth knowing the failure modes so you can guard
+against them.
 
 This afternoon, we'll look at **marimo**, a notebook tool that takes a
-different approach: it builds a dependency graph of your cells and
-*automatically* re-runs whatever depends on what changed — and it won't even
-let you define the same variable in two cells.
+different approach to exactly these four problems: it builds a dependency
+graph of your cells and *automatically* re-runs whatever depends on what
+changed — and it won't even let you define the same variable in two cells.
+Where this morning relied on your discipline, marimo tries to make the
+discipline structural.
+
+**What to watch for after lunch:** as we rebuild this morning's work in
+marimo, ask yourself "could the Cell A / Cell B trap happen here?" for each
+new feature. That comparison is the whole point of doing both halves in one
+day.
 
 We'll revisit `biomarker_data.csv` and rebuild parts of what we did this
 morning, so you can feel the difference directly.

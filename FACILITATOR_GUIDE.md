@@ -5,18 +5,15 @@
 
 | File | Purpose |
 |---|---|
-| `01_jupyter_morning_session.ipynb` | Morning notebook (Modules 1-5) |
-| `02_marimo_afternoon_session.py` | Afternoon notebook, marimo format |
+| `01_jupyter_morning_session.ipynb` | Morning notebook (Modules 1-5) — give this to attendees |
+| `02_marimo_afternoon_session.py` | Afternoon notebook, marimo format — give this to attendees |
 | `biomarker_data.csv` | Shared dataset used by both sessions (N=200) |
-| `generate_dataset.py` | Regenerates `biomarker_data.csv` if needed |
-| `01_jupyter_morning_session_INSTRUCTOR_executed.ipynb` | Morning notebook, pre-run, for your reference / answer key |
-| `01_jupyter_morning_session_SOLUTIONS.ipynb` | Morning notebook with Exercises 2.1/3.1/3.2 filled in |
-| `02_marimo_afternoon_session_SOLUTIONS.py` | Afternoon notebook with Exercises 4.1/5.1 filled in |
+| `01_jupyter_morning_session_SOLUTIONS.ipynb` | Morning notebook with all exercises filled in (your answer key) |
+| `02_marimo_afternoon_session_SOLUTIONS.py` | Afternoon notebook with Exercises 4.1, 5.1, and 6.1 filled in |
 
-All four "live" files (`01_...ipynb`, `02_...py`, `biomarker_data.csv`, and
-ideally a copy of the instructor `.ipynb`) should sit **in the same folder**
-on whatever environment attendees use — both notebooks load the CSV via a
-relative path (`"biomarker_data.csv"`).
+All three "live" files (`01_...ipynb`, `02_...py`, and `biomarker_data.csv`)
+should sit **in the same folder** on whatever environment attendees use —
+both notebooks load the CSV via a relative path (`"biomarker_data.csv"`).
 
 **Keep the `_SOLUTIONS` and `_INSTRUCTOR_executed` files out of the folder
 attendees can browse** — they're for your prep/reference only.

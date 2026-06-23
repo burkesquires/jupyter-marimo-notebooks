@@ -29,13 +29,19 @@ for cell in nb.cells:
         new_cells.append(cell)
         continue
 
-    # --- Exercise 3.1: filter Durham, mean PFOA ---
+    # --- Exercise 3.1: filter Durham, mean PFOA (via .query) ---
     if src.strip() == "# Your code here":
         new_cells.append(
             code(
                 f"# {CHECK} Solution to Exercise 3.1\n"
-                'durham_mean_pfoa = df[df["site"] == "Durham"]["pfoa_serum"].mean()\n'
-                'print(f"Mean serum PFOA in Durham: {durham_mean_pfoa:.2f} ng/mL")'
+                "# Primary approach: .query()\n"
+                'durham_mean_pfoa = df.query("site == \'Durham\'")["pfoa_serum"].mean()\n'
+                'print(f"Mean serum PFOA in Durham (.query): {durham_mean_pfoa:.2f} ng/mL")\n'
+                "\n"
+                "# Early-finisher check: boolean indexing should give the same number\n"
+                'durham_mean_bool = df[df["site"] == "Durham"]["pfoa_serum"].mean()\n'
+                'print(f"Mean serum PFOA in Durham (boolean): {durham_mean_bool:.2f} ng/mL")\n'
+                'print(f"Match: {durham_mean_pfoa == durham_mean_bool}")'
             )
         )
         continue
