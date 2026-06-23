@@ -3,8 +3,8 @@ Build 01_jupyter_morning_session.ipynb using nbformat.
 
 Mixed-skill-level audience, NIEHS, 9:30-12:00.
 Focus: mechanics of the notebook tool itself (cells, kernel, execution
-order, hidden state, hygiene), using the shared biomarker_data.csv as the
-running example. Statistics are intentionally minimal.
+model, hygiene), using the shared biomarker_data.csv as the running example.
+Statistics are intentionally minimal. Jupyter is taught on its own terms.
 """
 
 import nbformat as nbf
@@ -30,7 +30,7 @@ cells.append(md(r"""# Jupyter Notebooks for Scientific Computing
 | 10:20 - 10:35 | *Break* |
 | 10:35 - 11:15 | Module 3: Loading & Exploring Data |
 | 11:15 - 11:45 | Module 4: Notebook Hygiene & Reproducibility |
-| 11:45 - 12:00 | Module 5: Looking Ahead to marimo |
+| 11:45 - 12:00 | Module 5: Wrap-Up & Where Jupyter Shines |
 | 12:00 - 1:00 | *Lunch* |
 
 **Goal of the morning:** get comfortable with *how a Jupyter notebook works* —
@@ -337,10 +337,10 @@ ax.set_ylabel("Count")
 ax.set_title("Distribution of serum PFOA")
 plt.show()"""))
 
-cells.append(md(r"""### The "hidden state" trap
+cells.append(md(r"""### Understanding execution order and cell outputs
 
-This is the most important idea of the morning. Run the next three cells
-**in order**."""))
+This is the most important idea of the morning — the heart of how Jupyter's
+execution model works. Run the next three cells **in order**."""))
 
 cells.append(code(r"""# Cell A
 older = df[df["age"] > 50]
@@ -364,39 +364,44 @@ Talk through with a neighbor: at each step, what does Cell B's *displayed
 output* actually represent — the current data, or a snapshot from whenever
 it last ran?"""))
 
-cells.append(md(r"""**This is the core hazard of notebooks:** outputs on screen can be
-*stale* — leftover from a previous run, computed against data or code that
-no longer exists in that form. A notebook can *look* internally consistent
-and be completely wrong, because nothing forces cells to stay in sync with
-each other.
+cells.append(md(r"""**Here's what this teaches about Jupyter's model:** a cell's output is a
+**snapshot from the last time that cell ran**, not a live mirror of the
+current state. Jupyter gives you full manual control over execution — *you*
+decide which cell runs and when — and that control is exactly what makes
+notebooks so good for iterative, exploratory work. The flip side of that
+control is that you're the one keeping track of what's run.
 
 To make the answer explicit: after step 2, Cell B's output still showed the
 *old* mean — computed from the `age > 50` version of `older`, even though
-Cell A now defines `older` as `age > 60`. The displayed number was a
-**snapshot from the last time Cell B ran**, not a live reflection of the
-current data. Only re-running Cell B (step 4) brought it back into sync. And
-after a kernel restart (step 5), the *output text remains visible in the
-document* even though the kernel no longer has `older` defined at all —
-proof that what you see is the saved document, not the live program.
+Cell A now defines `older` as `age > 60`. Cell B simply hadn't been re-run
+yet. Re-running Cell B (step 4) brought it up to date. And after a kernel
+restart (step 5), the *output text remains visible in the document* even
+though the kernel no longer has `older` defined — a nice illustration of the
+two-things model from Module 1: the document (what you see) and the kernel
+(the live program) are distinct.
 
-This isn't a Jupyter bug — it's a direct consequence of cells being
-independently runnable in any order. It's also not unique to Jupyter; the
-same hazard exists in any notebook-style tool that lets you run cells
-piecemeal. Keep this example in mind; we'll revisit it this afternoon and
-see a tool that closes the gap."""))
+This is a direct, logical consequence of cells being independently runnable
+in any order — the same property that makes Jupyter flexible. The next module
+covers the simple, reliable habit that keeps the document and kernel in
+sync: **Restart & Run All**."""))
 
-cells.append(md(r"""### Exercise 3.2 — Break it, then find it
+cells.append(md(r"""### Exercise 3.2 — Explore the document/kernel distinction
+
+This exercise makes the two-things model from Module 1 concrete and
+hands-on.
 
 1. In the empty cell below, create a new variable, e.g. `threshold = 200`.
 2. In the cell *after that*, use `threshold` in some small calculation
    (e.g. `df[df["cholesterol"] > threshold]`).
 3. Now **delete the cell that defines `threshold`** (`Esc`, `D`, `D`).
 4. Run the remaining cell. It still works — the kernel still remembers
-   `threshold`, even though no cell in the notebook defines it anymore!
+   `threshold`, even though no cell in the notebook defines it anymore. (The
+   kernel holds the live state; the document is a separate thing.)
 5. Now: **Restart & Run All** (Kernel menu → Restart Kernel and Run All
    Cells).
 
-What happens on step 5, and why is that actually the *more honest* result?"""))
+What happens on step 5, and why is that result the one you'd actually want
+to trust before sharing the notebook?"""))
 
 cells.append(code(r"""# step 1: define threshold here
 """))
@@ -410,11 +415,16 @@ cells.append(code(r"""# step 2: use threshold here
 cells.append(md(r"""---
 ## Module 4: Notebook Hygiene & Reproducibility (30 min)
 
-A few habits that prevent the problems from Module 3:
+Now that you understand how Jupyter's execution model works, here are the
+habits that make the most of it — the same practices experienced scientific
+Python users rely on to keep their notebooks reproducible and easy to share:
 
 1. **Restart & Run All before you trust a result, share a notebook, or end
-   a session.** This is the closest thing notebooks have to "does this
-   actually work?" If it doesn't run top-to-bottom cleanly, it's not done.
+   a session.** This is Jupyter's built-in reproducibility check — it runs
+   the whole notebook top-to-bottom in a fresh kernel, exactly as a
+   colleague would. If it runs cleanly start to finish, you know the
+   document and the results are in sync. (R Markdown users will recognize
+   this as the same idea as knitting in a clean session.)
 2. **Write cells to run top-to-bottom, in the order they appear.** If a
    later cell depends on an earlier one, that dependency should be visible
    *in the document*, not just in kernel memory.
@@ -463,46 +473,61 @@ print("Kernel working directory:", os.getcwd())"""))
 # Module 5
 # ---------------------------------------------------------------------------
 cells.append(md(r"""---
-## Module 5: Looking Ahead (15 min)
+## Module 5: Wrap-Up & Where Jupyter Shines (15 min)
 
-Let's name the pain points from this morning — each one traces back to a
-specific moment you just lived through:
+Let's consolidate what you built this morning. You now understand Jupyter's
+**execution model** — the single most important thing to internalize as a
+notebook user:
 
-- **Execution order is invisible** — the document doesn't show you the
-  *order* cells actually ran in, only the *last* order. (Exercise 1.1: the
-  `In [n]` counter was your only clue.)
-- **State can outlive its source** — delete or change the cell that created
-  a variable, and the kernel may still remember the old value. (Exercise
-  3.2: `threshold` kept working after you deleted its cell.)
-- **Outputs can be stale** — what's on screen may not reflect the current
-  code or data at all. (The Cell A / Cell B trap: Cell B's number was a
-  snapshot, not a live value.)
-- **Discipline is the only fix** — Restart & Run All works, but it relies on
-  *you* remembering to do it. (Exercise 4.1: nothing *forces* the check;
-  you have to choose to run it.)
+- **You control execution.** Cells run when *you* run them, in whatever order
+  you choose. The `In [n]` counter records that order. This manual control is
+  what makes notebooks excellent for iterative, exploratory analysis — you can
+  poke at data, try things, and re-run just the piece you're working on.
+- **The document and the kernel are two separate things.** The kernel holds
+  live state; the document holds cells and their last-saved outputs. A cell's
+  output is a snapshot from when it last ran.
+- **Restart & Run All keeps them in sync.** It's Jupyter's built-in
+  reproducibility check, and the one habit that matters most before you trust
+  or share a result.
 
-None of these mean Jupyter is bad — it's the most widely used notebook in
-the world for good reason, and the skills you built this morning transfer
-everywhere. But it's worth knowing the failure modes so you can guard
-against them.
+These aren't quirks to memorize — they're a coherent model, and once it
+clicks, notebooks become a powerful and predictable tool.
 
-This afternoon, we'll look at **marimo**, a notebook tool that takes a
-different approach to exactly these four problems: it builds a dependency
-graph of your cells and *automatically* re-runs whatever depends on what
-changed — and it won't even let you define the same variable in two cells.
-Where this morning relied on your discipline, marimo tries to make the
-discipline structural.
+### Where Jupyter is the right choice
 
-**What to watch for after lunch:** as we rebuild this morning's work in
-marimo, ask yourself "could the Cell A / Cell B trap happen here?" for each
-new feature. That comparison is the whole point of doing both halves in one
-day.
+Jupyter is the most widely used notebook in scientific computing, and for
+good reasons that are worth naming:
 
-We'll revisit `biomarker_data.csv` and rebuild parts of what we did this
-morning, so you can feel the difference directly.
+- **Ubiquity and ecosystem.** It's the de facto standard — the format your
+  collaborators expect, the one Google Colab and most cloud platforms run,
+  and the one with the deepest set of extensions, kernels (R, Julia, and
+  100+ others), and integrations.
+- **Sharing and teaching.** `.ipynb` files render directly on GitHub, in
+  nbviewer, and in countless tutorials. If you want someone to *read* your
+  analysis without running it, the saved outputs are right there.
+- **Exploratory, throwaway work.** When you're rapidly trying ideas, full
+  manual control over what runs (and when) is exactly what you want.
+- **The broadest toolchain.** JupyterLab, Jupyter Notebook, Colab, VS Code,
+  and many other editors all speak `.ipynb` natively.
 
-**See you back here at 1:00 with this notebook in a working
-(Restart & Run All clean!) state.**"""))
+The skills you built this morning — cells, the kernel, execution order,
+markdown narrative, data exploration, and Restart & Run All — transfer to
+every one of those environments.
+
+### This afternoon: marimo
+
+After lunch we'll learn **marimo**, a newer Python notebook with a different
+execution model: instead of you choosing run order, marimo determines it
+automatically from how cells depend on one another. It's a genuinely
+different design with its own strengths — not a replacement for what you
+learned this morning, but a second tool worth knowing. We'll use the same
+`biomarker_data.csv` so you can focus on the tool rather than the data.
+
+Both tools are worth having in your kit; by the end of the day you'll be able
+to pick the right one for a given task.
+
+**See you back here at 1:00 — and try leaving this notebook in a working
+(Restart & Run All clean!) state, since that's the habit we just covered.**"""))
 
 nb["cells"] = cells
 

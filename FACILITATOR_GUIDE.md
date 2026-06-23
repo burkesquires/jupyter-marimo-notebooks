@@ -96,24 +96,40 @@ file.
 
 ## Delivery notes
 
-- **The morning's "hidden state" demo (Module 3) is the linchpin of the
-  whole day.** Everything in the afternoon refers back to it ("recall Cell
-  A/B..."). Slow down here — have people actually do the
-  change-Cell-A-don't-rerun-Cell-B-look-at-the-output sequence themselves,
-  not just watch you do it.
+- **The two halves are parallel intro trainings, not a "migrate from Jupyter
+  to marimo" arc.** A participant should leave able to use *either* tool well
+  and pick the right one for a task. Teach each tool positively, on its own
+  terms. The morning is a complete intro to Jupyter; the afternoon a complete
+  intro to marimo.
+- **The execution-model contrast is the key teaching thread, and it's
+  factual, not evaluative.** Jupyter: *you* choose run order (great for
+  exploration); marimo: the dependency graph chooses it (great for staying in
+  sync). Present both as legitimate designs. Avoid framing Jupyter's model as
+  a "trap" or marimo's as "the fix" — that's the tone we deliberately moved
+  away from.
+- **The morning's execution-order demo (Module 3, Cell A/B) is the most
+  important hands-on moment of the morning.** Slow down here — have people
+  actually do the change-Cell-A-don't-rerun-Cell-B-look-at-the-output
+  sequence themselves. The lesson is "a cell's output is a snapshot from when
+  it last ran, and Restart & Run All keeps the document and kernel in sync" —
+  a core part of understanding how Jupyter works, taught as a feature of the
+  model, not a defect.
 - **Module 1 of the afternoon (the `MultipleDefinitionError` discussion) is
   intentionally *described*, not triggered live** — the notebook is built to
   run clean end-to-end. If you want to *show* the actual error message live,
   you can briefly type a duplicate `df = ...` cell into a scratch copy,
   trigger the error on the projector, then delete it — don't do this in the
   master copy attendees will use.
+- **`marimo convert` is framed as practical interop** (open one of the
+  millions of existing `.ipynb` files from GitHub in marimo), not as a
+  migration mandate. Keep that framing if asked about it.
 - **Mixed skill levels:** the Exercise cells (3.1/3.2 in the morning, 2.1/
-  4.1/5.1 in the afternoon) are designed so faster participants can extend
+  4.1/5.1/6.1 in the afternoon) are designed so faster participants can extend
   them (e.g., Exercise 4.1's optional cholesterol-threshold + reference-line
   task) while others complete the core step. Consider pairing.
-- **Timing buffer:** the module times sum to exactly 6.5 hours of content
-  across 7 hours scheduled (incl. lunch and two breaks) — there's effectively
-  no slack. If Module 3 (morning) or the SQL module (afternoon) run long,
+- **Timing buffer:** the module times sum to roughly 6.5 hours of content
+  across 7 hours scheduled (incl. lunch and two breaks) — there's little
+  slack. If Module 3 (morning) or the SQL module (afternoon) run long,
   Module 7 (afternoon recap) is the easiest to compress to 10 minutes.
 
 ---

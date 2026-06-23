@@ -23,22 +23,24 @@ def _(mo):
         |---|---|
         | 1:00 - 1:20 | Module 1: What Is marimo? |
         | 1:20 - 1:50 | Module 2: marimo Basics |
-        | 1:50 - 2:20 | Module 3: Rebuilding the Morning Workflow |
+        | 1:50 - 2:20 | Module 3: A Reactive Data Workflow |
         | 2:20 - 2:35 | *Break* |
         | 2:35 - 3:15 | Module 4: Interactive UI |
         | 3:15 - 3:45 | Module 5: SQL Cells |
         | 3:45 - 4:15 | Module 6: Apps, Export, Sandbox & Testing |
         | 4:15 - 4:30 | Module 7: Recap & Q&A |
 
-        **Goal of the afternoon:** see how a *reactive* notebook changes the
-        rules from this morning. Same dataset (`biomarker_data.csv`), same
-        kinds of tasks — but a different execution model. As before, the
-        focus is the **tool**, not the statistics.
+        **Goal of the afternoon:** learn marimo, a reactive Python notebook,
+        on its own terms. We'll use the same dataset as the morning
+        (`biomarker_data.csv`) so you can focus on the tool rather than the
+        data. As in the morning, the focus is the **tool**, not the
+        statistics.
 
         > **How to use this notebook:** marimo notebooks are plain `.py`
-        > files. Cells run automatically when their inputs change — there's
-        > no "run order" to manage. Editing UI elements (sliders, dropdowns)
-        > re-runs whatever depends on them, instantly.
+        > files. Cells run automatically when their inputs change — marimo
+        > works out the run order from how cells depend on each other.
+        > Editing a value or moving a UI element (sliders, dropdowns) re-runs
+        > whatever depends on it.
 
         > **📋 INSTRUCTOR SOLUTIONS COPY** — Exercises 4.1 and 5.1 are filled
         > in below (look for "✅ Solution"). Keep this copy separate from the
@@ -92,28 +94,30 @@ def _(mo):
     mo.md(
         r"""
         Drag the slider above. The "doubled" cell — which you didn't touch —
-        updated immediately. Nothing was "re-run" in the Jupyter sense; marimo
-        saw that `count` changed, knew the `doubled` cell depends on `count`,
-        and re-executed exactly that cell (and nothing else).
+        updated immediately. marimo saw that `count` changed, knew the
+        `doubled` cell depends on `count`, and re-executed exactly that cell
+        (and nothing else). This is marimo's defining feature: it tracks how
+        cells depend on each other and keeps everything consistent
+        automatically.
 
-        ### The other half of the deal: one name, one cell
+        ### One variable, one cell
 
-        In exchange for that automatic re-running, marimo enforces a rule
-        that Jupyter doesn't: **a variable can only be assigned in one
-        cell.** If you write `df = ...` in two different cells, marimo
-        refuses to run, with an error like:
+        marimo has one rule that follows directly from its reactive design:
+        **a variable can only be assigned in one cell.** If you write `df =
+        ...` in two different cells, marimo asks you to rename one, with a
+        message like:
 
         ```
         MultipleDefinitionError: The variable 'df' was defined by another cell
         ```
 
-        This feels restrictive at first. But think back to this morning's
-        Module 3 — `df = df[...]` redefinitions, scattered across cells, were
-        *exactly* the source of "which version of `df` am I looking at?"
-        confusion. marimo's rule forces you to give meaningfully different
-        things different names (`df`, `df_durham`, `df_filtered`, ...) —
-        which, not coincidentally, was also Module 4's hygiene tip this
-        morning. marimo just makes it mandatory.
+        The reason is mechanical: for marimo to know which cells to re-run
+        when `df` changes, each variable needs exactly one definition site.
+        In practice this nudges you toward giving distinct things distinct
+        names (`df`, `df_durham`, `df_filtered`, ...), which tends to make
+        notebooks easier to read. It's a small adjustment if you're used to
+        reassigning the same name repeatedly, and most people find the habit
+        natural within a few cells.
         """
     )
     return
@@ -123,23 +127,25 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
-        ### Revisiting this morning's hidden-state trap
+        ### What the reactive model guarantees
 
-        Recall Cell A / Cell B from this morning: Cell B's *displayed output*
-        could silently go stale relative to Cell A.
+        Because marimo runs cells based on their dependencies, two things are
+        always true while you work:
 
-        In marimo, that specific failure mode can't happen:
+        - **Outputs stay current.** If cell B uses a value from cell A,
+          changing A automatically re-runs B. You never have to remember to
+          re-run downstream cells by hand.
+        - **The notebook and the running program stay in step.** marimo
+          notebooks are `.py` files, and the live state is derived directly
+          from running that file's cells in dependency order — so what you
+          see reflects the current code.
 
-        - If Cell B depends on Cell A's output, **changing Cell A
-          automatically re-runs Cell B** — its output is never stale.
-        - If you delete the cell that defines a variable, every cell that
-          referenced it immediately shows an error (undefined name) — it
-          can't silently keep using an old value from kernel memory, because
-          there *is no separate kernel memory* to fall out of sync with the
-          file. The file (this notebook) and the running program are kept in
-          lock-step.
-
-        We'll feel this directly in Module 3.
+        This is the flip side of the morning's execution model. In Jupyter,
+        *you* choose the run order, which is ideal for free-form exploration.
+        In marimo, the *dependency graph* chooses it for you, which is ideal
+        when you want the whole notebook to stay internally consistent as you
+        edit. Neither is "correct" — they're two designs suited to different
+        ways of working. We'll feel marimo's version directly in Module 3.
         """
     )
     return
@@ -164,8 +170,8 @@ def _(mo):
           explicitly run them — useful for expensive computations you don't
           want firing on every keystroke.
 
-        Let's build a small reactive chain, the same shape as `x` / `y` from
-        this morning.
+        Let's build a small reactive chain to see the dependency tracking in
+        action.
         """
     )
     return
@@ -199,18 +205,55 @@ def _(a, b, c, mo):
 def _(mo):
     mo.md(
         r"""
+        ### Live narrative: mo.md with computed values
+
+        The `mo.md(f"...")` pattern above isn't just for simple labels — it's
+        how marimo enables **living results prose**. Instead of computing a
+        result and manually typing the number into a sentence (then forgetting
+        to update it when the data changes), you embed the computation
+        directly in the narrative. The paragraph below re-writes itself
+        whenever `a` changes:
+        """
+    )
+    return
+
+
+@app.cell
+def _(a, b, c, mo):
+    mo.md(
+        f"""
+        ### Reactive results paragraph
+
+        In this chain, a base value of **{a}** produces a doubled value of
+        **{b}** and a final value of **{c}**. The ratio of final to base is
+        **{c / a:.2f}x**.
+
+        *Change `a = 5` above to any number and watch this entire paragraph
+        rewrite itself — no copy-paste, no stale numbers.*
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
         ### Exercise 2.1 — Change one thing, watch the chain
 
         1. Scroll up to the `a = 5` cell and change it to `a = 50`.
-        2. Watch `b`, `c`, *and the markdown cell below them* all update —
-           you ran one cell; three updated.
+        2. Watch `b`, `c`, the inline label *and the results paragraph* all
+           update — you ran one cell; four cells updated. That's the
+           dependency graph at work: marimo re-ran exactly the cells that
+           depend on `a`.
         3. Now try the editor's drag handle to physically move the
            `c = b + 1` cell to the very top of the file (above `a = 5`).
-           Does the notebook still work the same way? (It should — file
-           position is cosmetic.)
+           Does the notebook still work the same way? (It should — marimo
+           runs cells by dependency, so file position is cosmetic.)
 
-        Compare this to this morning's Exercise 1.1, where changing `x` did
-        **not** automatically update `y`.
+        Notice what the results paragraph demonstrates: when we do this with
+        real biomarker data in Module 3, changing a filter will rewrite the
+        results narrative automatically — no copying numbers by hand.
         """
     )
     return
@@ -221,11 +264,10 @@ def _(mo):
     mo.md(
         r"""
         ---
-        ## Module 3: Rebuilding the Morning Workflow (30 min)
+        ## Module 3: A Reactive Data Workflow (30 min)
 
-        Same dataset as this morning. Let's load it and immediately try to
-        recreate the Module 3 "hidden state" setup — and see what marimo does
-        differently.
+        Let's load the biomarker data and build a small analysis on it,
+        seeing how marimo's reactivity behaves with real data.
         """
     )
     return
@@ -242,26 +284,26 @@ def _(pd):
 def _(mo):
     mo.md(
         r"""
-        ### Try this morning's trap again
+        ### One variable, one cell — in practice
 
-        This morning, after loading `df`, the next cell was something like:
-
-        ```python
-        older = df[df["age"] > 50]
-        ```
-
-        If you add a *new* cell below and write:
+        Say you've loaded `df` and now want a Durham-only subset. It's
+        tempting to write:
 
         ```python
-        df = df[df["site"] == "Durham"]
+        df = df[df["site"] == "Durham"]   # reassigning df
         ```
 
-        marimo will immediately flag a `MultipleDefinitionError` — `df` is
-        already defined, two cells up. **You're stopped before the confusion
-        can even start.**
+        marimo will flag a `MultipleDefinitionError`, because `df` is already
+        defined in the cell above. The fix is to give the subset its own
+        name:
 
-        The fix is exactly the naming discipline from this morning's Module 4:
-        give the filtered version its own name.
+        ```python
+        df_durham = df[df["site"] == "Durham"]
+        ```
+
+        This keeps both the full dataset and the subset available, each with
+        a clear name — which also means any cell can refer to whichever one
+        it needs, and marimo can track those dependencies cleanly.
         """
     )
     return
@@ -304,9 +346,57 @@ def _(mo):
         histogram — several cells away — redrew itself each time, with no
         "run" action on your part.
 
-        This is the direct answer to this morning's closing question: *"what
-        if a notebook tracked dependencies and only ran what's needed,
-        automatically?"* This is what that looks like.
+        This is marimo's reactive model on real data: change one input, and
+        everything that depends on it updates automatically.
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### The full pipeline: filter → compute → narrative
+
+        The real payoff of reactivity isn't just a redrawing histogram. It's
+        what happens when your analysis has **multiple downstream steps** —
+        filters, summaries, figures, and written results — all depending on
+        the same upstream choices.
+
+        The cells below build a simple pipeline on top of `df_durham`:
+        a computed-stats cell, and a results narrative that reads like a
+        methods section. Change the filter that defines `df_durham` and
+        everything — numbers, prose, all of it — updates in one pass.
+        """
+    )
+    return
+
+
+@app.cell
+def _(df, df_durham):
+    n_total = len(df)
+    n_durham = len(df_durham)
+    mean_pfoa_durham = round(df_durham["pfoa_serum"].mean(), 2)
+    mean_pfoa_overall = round(df["pfoa_serum"].mean(), 2)
+    pct_durham = round(n_durham / n_total * 100, 1)
+    return mean_pfoa_durham, mean_pfoa_overall, n_durham, n_total, pct_durham
+
+
+@app.cell
+def _(mean_pfoa_durham, mean_pfoa_overall, mo, n_durham, n_total, pct_durham):
+    mo.md(
+        f"""
+        ### Live results summary
+
+        The Durham site contributed **{n_durham} of {n_total} participants**
+        ({pct_durham}%). Mean serum PFOA in Durham was
+        **{mean_pfoa_durham} ng/mL**, compared to **{mean_pfoa_overall} ng/mL**
+        across all three sites.
+
+        *Now go back and change the filter `df[df["site"] == "Durham"]` to
+        `df[df["site"] == "Chapel Hill"]` and watch every number in this
+        paragraph update automatically — no copy-paste, no stale values.*
         """
     )
     return
@@ -481,7 +571,24 @@ def _(mo):
 
         (In the editor, you create one of these via the cell-type menu —
         "SQL". The underlying code is just a call to `mo.sql(...)`.)
-        """
+
+        ### When SQL vs. Python
+
+        Both can filter and aggregate the same data — the question is which
+        reads more clearly for the task:
+
+        | Task | Better tool |
+        |---|---|
+        | Row filtering, grouping, aggregation | SQL — closer to how the question is phrased |
+        | Reshaping, merging multiple DataFrames | Either; pandas has strong join/pivot support |
+        | Statistical modeling, custom functions | Python — SQL has no `scipy.stats` |
+        | Quick ad-hoc check on a known DataFrame | SQL — often fewer keystrokes |
+
+        For researchers already comfortable with SQL (common in database-
+        driven labs or with REDCap/clinical data backgrounds), native SQL
+        cells mean you don't have to translate the query into pandas idioms —
+        write the SQL you'd write anywhere, get a DataFrame back, continue
+        in Python."""
     )
     return
 
@@ -523,6 +630,47 @@ def _(plt, site_summary):
     sql_ax.tick_params(axis="x", labelrotation=15)
     sql_fig
     return sql_ax, sql_fig
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### SQL → Python → narrative: a complete pipeline
+
+        The SQL result (`site_summary`) is just a DataFrame — it flows into
+        any Python cell as a normal dependency. This means you can chain SQL
+        and Python together: use SQL for the aggregation it's good at, then
+        Python for the downstream logic or annotation.
+
+        The cells below take `site_summary`, identify the highest-exposure
+        site in Python, and write a reactive results sentence — the same
+        live-narrative pattern from Module 2, now driven by a SQL query.
+        """
+    )
+    return
+
+
+@app.cell
+def _(site_summary):
+    highest_site_row = site_summary.loc[site_summary["avg_pfoa"].idxmax()]
+    highest_site = highest_site_row["site"]
+    highest_pfoa = round(highest_site_row["avg_pfoa"], 2)
+    return highest_pfoa, highest_site, highest_site_row
+
+
+@app.cell
+def _(highest_pfoa, highest_site, mo):
+    mo.md(
+        f"""
+        **Highest mean PFOA by site (SQL → Python):**
+        The {highest_site} site had the highest mean serum PFOA at
+        **{highest_pfoa} ng/mL**. This value is drawn live from the SQL
+        aggregation above — edit the query (e.g. add a `WHERE age > 50`
+        clause) and this sentence updates automatically.
+        """
+    )
+    return
 
 
 @app.cell
@@ -572,13 +720,38 @@ def _(mo):
         ---
         ## Module 6: Apps, Export, Sandbox & Testing (30 min)
 
-        ### From notebook to app
+        ### From notebook to app — the research lifecycle
 
-        `marimo run notebook.py` serves this **same file** as a read-only
-        web app: code cells are hidden, and only markdown, UI elements, and
-        outputs (tables, plots) are shown. Individual cells can also be
-        marked `@app.cell(hide_code=True)` to hide their source even in edit
-        mode. No separate "app" codebase — the notebook *is* the app.
+        The three modes (`edit` / `run` / `export`) map naturally onto stages
+        a research analysis goes through:
+
+        **Stage 1 — Explore** (`marimo edit notebook.py`)
+        You're in the editor, cells visible, building the analysis
+        interactively. This is where you spend most of your time during
+        active development. The reactive graph means you can tune parameters
+        and immediately see downstream effects without managing "run this, then
+        that."
+
+        **Stage 2 — Share with collaborators** (`marimo run notebook.py`)
+        Once the analysis is stable, `marimo run` serves it as a clean web
+        app — code hidden, only outputs and controls visible. A colleague
+        with no Python background can adjust a dropdown or slider and explore
+        the results themselves, without touching the code. Same file, zero
+        extra work.
+
+        **Stage 3 — Archive / publish** (`marimo export`)
+        `marimo export html` creates a static snapshot for a report or
+        supplementary material. `marimo export html-wasm` creates an
+        interactive version that runs in any browser with no server — useful
+        for journal supplementaries or institutional repositories that can't
+        host a Python process. `marimo export ipynb` hands the work back to
+        a Jupyter user if needed.
+
+        `marimo run notebook.py` serves this file as a read-only web app:
+        code cells are hidden, and only markdown, UI elements, and outputs
+        (tables, plots) are shown. Individual cells can also be marked
+        `@app.cell(hide_code=True)` to hide their source even in edit mode.
+        No separate "app" codebase — the notebook *is* the app.
 
         ### Exporting
 
@@ -595,14 +768,23 @@ def _(mo):
           script (what you'd run outside marimo entirely)
         - `marimo export pdf` / `marimo export md` — for sharing or docs
 
-        ### Converting *from* Jupyter
+        ### Opening an existing Jupyter notebook in marimo
 
-        `marimo convert notebook.ipynb -o notebook.py` does a best-effort
-        conversion of a `.ipynb` into marimo format. The most common manual
-        fix-up afterward is exactly today's theme: Jupyter notebooks often
-        reassign the same variable name (`df = df[...]`) across cells, which
-        marimo's one-name-one-cell rule won't allow — you'll need to rename
-        those, the same way we renamed `df` to `df_durham` in Module 3.
+        There are millions of Jupyter notebooks out in the world — on GitHub,
+        in papers' supplementary materials, in shared analyses. If you find
+        one you'd like to work with in marimo, `marimo convert` opens it:
+
+        ```
+        marimo convert notebook.ipynb -o notebook.py
+        ```
+
+        This does a best-effort conversion of a `.ipynb` into marimo's `.py`
+        format. Because marimo uses the one-variable-one-cell model, the most
+        common manual fix-up afterward is renaming any variables that the
+        original notebook reassigned across cells (a Jupyter notebook might
+        use `df = df[...]` several times; in marimo you'd give each step its
+        own name, as in Module 3). It's usually a quick cleanup, and it lets
+        you bring existing work into marimo when that's the tool you want.
 
         ### Sandbox mode & reproducible environments
 
@@ -757,33 +939,41 @@ def _(mo):
         ---
         ## Module 7: Recap & Q&A (15 min)
 
+        A factual side-by-side of the two tools you've learned today. Neither
+        column is "better" — they're different designs, and the right choice
+        depends on the task.
+
         | | Jupyter | marimo |
         |---|---|---|
         | File format | `.ipynb` (JSON) | `.py` (plain Python) |
-        | Execution order | Whatever order you ran cells, tracked by `In [n]` | Dependency graph, independent of file position |
-        | Re-running on change | Manual ("Restart & Run All" is the gold standard) | Automatic — affected cells re-run |
-        | Reassigning a variable in another cell | Allowed (and a common source of bugs) | Disallowed (`MultipleDefinitionError`) |
-        | Interactivity | Widgets (`ipywidgets`), need callbacks | `mo.ui` elements, reactive by default |
-        | SQL on DataFrames | Via libraries (e.g. `duckdb` manually) | Native `mo.sql` cells |
-        | Running as an app | Needs a separate framework (Voila, Streamlit, ...) | `marimo run` on the same file |
-        | Version control diffs | Noisy (JSON, embedded outputs) | Clean (plain Python) |
-        | Unit testing | External tools (`ipytest`) or separate test scripts | Native test cells; `pytest notebook.py` works directly |
-        | Reproducible environments | Global install; deps implicit | `--sandbox` mode; deps pinned in script header |
+        | Execution model | You choose run order; tracked by `In [n]` | Dependency graph determines run order |
+        | Re-running on change | Manual (Restart & Run All to resync) | Automatic — dependent cells re-run |
+        | Variable assignment | A name can be reassigned across cells | One definition per variable (enables reactivity) |
+        | Interactivity | Widgets (`ipywidgets`) with callbacks | `mo.ui` elements, reactive by default |
+        | SQL on DataFrames | Via libraries (e.g. `duckdb` directly) | Native `mo.sql` cells |
+        | Running as an app | Add-on frameworks (Voila, Streamlit, ...) | `marimo run` on the same file |
+        | Version control diffs | JSON with embedded outputs | Plain Python |
+        | Ecosystem & reach | Largest; renders on GitHub, Colab, many editors; R/Julia/100+ kernels | Newer, Python-focused, growing |
+        | Reproducible environments | Managed separately (conda, venv, requirements) | Optional `--sandbox` mode pins deps in the file |
 
-        ### When to use which
+        ### When each is a great fit
 
-        Neither tool is strictly "better" — they suit different moments:
+        Both are excellent tools; many researchers use both depending on the
+        job.
 
-        - **Jupyter** remains excellent for fast, throwaway exploration; it's
-          the dominant teaching/sharing format, has the largest ecosystem,
-          and `.ipynb` is what most collaborators expect to receive.
-        - **marimo** earns its keep when a notebook will be **revisited,
-          shared, parameterized, or turned into a small app/dashboard** —
-          anywhere the "is this actually still correct?" question from this
-          morning matters most.
+        - **Reach for Jupyter when** you want the broadest ecosystem and
+          compatibility, you're doing fast exploratory work, you're sharing
+          with collaborators who expect `.ipynb`, you're teaching or
+          publishing where rendered outputs on GitHub/Colab matter, or you
+          need a non-Python kernel (R, Julia, etc.).
+        - **Reach for marimo when** you want cells to stay automatically in
+          sync as you edit, you're building an interactive view or small app
+          for collaborators, you value clean `.py` files for version control,
+          or you want the notebook to carry its own reproducible environment.
 
-        Many people use both: explore in Jupyter, then `marimo convert` an
-        analysis that's "graduating" into something others will rely on.
+        And the two interoperate: `marimo convert` opens an existing `.ipynb`
+        in marimo, and `marimo export ipynb` goes the other way — so choosing
+        one today doesn't lock you out of the other.
 
         ### Resources
 
